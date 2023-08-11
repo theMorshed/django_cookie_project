@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from datetime import datetime, timedelta
+from django.http import HttpResponse
 
 # Create your views here.
 def home(request):
@@ -31,9 +32,13 @@ def set_session(request):
     return render(request, 'set_session.html')
 
 def get_session(request):
-    name = request.session.get('name')
-    language = request.session.get('language')
-    return render(request, 'get_session.html', {'name': name, 'language': language})
+    if 'name' in request.session:
+        name = request.session.get('name')
+        request.session.modified = True
+        language = request.session.get('language')
+        return render(request, 'get_session.html', {'name': name, 'language': language})
+    else:
+        return HttpResponse('Your session is expired, Please login again')
 
 def delete_session(request):
     if request.session.get('name'):
